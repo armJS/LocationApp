@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <title>Location App</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="panel">
+    <div>
+        <input id="address" type="text" placeholder="Enter a location"/>
+        <button id="resetBtn">Reset Selection</button>
+        <div id="area"></div>
+    </div>
+</div>
+<div id="map"></div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAm5L-a_2ZjOjhvWL1IS0ZT46NRrEIcdsU&libraries=geometry,drawing"></script>
+<script src="index.js"></script>
+<script src="map.js"></script>
+</body>
+</html>

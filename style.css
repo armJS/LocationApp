@@ -1,0 +1,15 @@
+#map,
+html,
+body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+#panel {
+    width: 200px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    float: right;
+    margin: 10px;
+}
