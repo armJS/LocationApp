@@ -11,13 +11,19 @@
 <body>
 <div id="panel">
     <div>
-        <input id="address" type="text" placeholder="Enter a location"/>
+        <div class="search-container">
+            <label for="address-input" class="address-lbl">Address</label>
+            <input id="address-input" type="text" placeholder="Search"/>
+        </div>
+        <button id="confirmBtn" disabled>Confirm selection</button>
+        <br/>
+
         <button id="resetBtn">Reset Selection</button>
         <div id="area"></div>
     </div>
 </div>
 <div id="map"></div>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAm5L-a_2ZjOjhvWL1IS0ZT46NRrEIcdsU&libraries=geometry,drawing"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAm5L-a_2ZjOjhvWL1IS0ZT46NRrEIcdsU&libraries=geometry,drawing,places"></script>
 <script src="index.js"></script>
 <script src="map.js"></script>
 </body>

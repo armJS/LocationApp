@@ -2,12 +2,13 @@ function Map() {
     let map;
     let drawingManager;
     let selectedShape;
+    let infowindow;
 
     let initMap = () => {
         map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: 40.177200, lng: 44.503490},
             mapTypeId: google.maps.MapTypeId.ROADMAP,
-            zoom: 15,
+            zoom: 12,
             disableDefaultUI: true,
             zoomControl: true
         });
@@ -32,17 +33,37 @@ function Map() {
         drawingManager.setMap(map);
     };
 
+
+    let initAdressAutocomplete = () => {
+        let input = document.getElementById('address-input');
+        let autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo('bounds', map);
+
+        autocomplete.addListener('place_changed', () => {
+            deleteSelectedShape();
+            let place = autocomplete.getPlace();
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
+        });
+    };
+
     let showInfoWindow = (area) => {
         let content = `<div id="infowindow-content">
            <span>Area = ${Math.trunc(area)} m<sup>2</sup></span>
         </div>`;
 
-        let infowindow = new google.maps.InfoWindow({
+        infowindow = new google.maps.InfoWindow({
             content,
             position: selectedShape.getPolygonBounds().getCenter(),
         });
 
         infowindow.open(map);
+    };
+
+    let hideInfoWindow = () => {
+        if (infowindow) {
+            infowindow.close();
+        }
     };
 
     let calculateArea = () => {
@@ -72,6 +93,7 @@ function Map() {
             selectedShape.setMap(null);
         }
 
+        hideInfoWindow();
         drawingManager.setDrawingMode("polygon");
     };
 
@@ -93,12 +115,16 @@ function Map() {
     let initListeners = () => {
         google.maps.event.addListener(drawingManager, 'overlaycomplete', onOverlaycomplete);
         google.maps.event.addDomListener(document.getElementById('resetBtn'), 'click', deleteSelectedShape);
+        $('#confirmBtn').on('click', onConfirm);
     };
+
+    let onConfirm = () => {};
 
     this.initialize = () => {
         initMap();
         initDrawingManager();
         initListeners();
+        initAdressAutocomplete();
 
     }
 }
