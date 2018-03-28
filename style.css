@@ -21,7 +21,7 @@ body {
     font-size: 20px;
 }
 
-.search-container{
+.search-container {
     margin-top: 200px;
 }
 
@@ -45,8 +45,55 @@ button#confirmBtn, button#resetBtn {
     cursor: pointer;
 }
 
+button#confirmBtn:disabled {
+    background: #dddddd;
+}
+
 button#resetBtn {
     background-color: transparent;
     color: blue;
     border: 2px solid blue;
+}
+
+.table {
+    border-collapse: collapse;
+    /*  width: auto;*/
+    border: 1px solid beige;
+}
+
+table, th {
+    border: 1px solid silver;
+}
+
+.table-header {
+    /* display: flex;
+     width: 100%;*/
+    background: #000;
+    color: white;
+}
+
+.table-row {
+    /* display: flex;*/
+    width: 100%;
+}
+
+.table th {
+    padding: 10px 20px;
+}
+
+.table td {
+    text-align: center;
+}
+
+div.modal {
+    max-width: 1500px;
+    height: 100%;
+}
+
+.edit {
+    cursor: pointer
+}
+
+.hide {
+    display: none;
 }

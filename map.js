@@ -1,18 +1,46 @@
+const MAP_MODE = {
+    ADD_ROW: 'ADD_ROW',
+    UPDATE_ROW: 'UPDATE_ROW'
+};
+
 function Map() {
     let map;
     let drawingManager;
     let selectedShape;
     let infowindow;
+    let place;
+    let addressInput;
+    let $confirmBtn = $("#confirmBtn");
+    let MODE = MAP_MODE.ADD_ROW;
+    let updateRowIndex;
 
-    let initMap = () => {
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 40.177200, lng: 44.503490},
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-            zoom: 12,
-            disableDefaultUI: true,
-            zoomControl: true
-        });
-    };
+
+    let initMap = (initialData) => {
+            let center = initialData ? {lat: initialData.location.lat(), lng: initialData.location.lng()} : {
+                lat: 40.177200,
+                lng: 44.503490
+            };
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: center,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                zoom: 14,
+                disableDefaultUI: true,
+                zoomControl: true
+            });
+
+            if (initialData) {
+                let polygon = new google.maps.Polygon({
+                    paths: initialData.shapePaths
+                });
+                polygon.setMap(map);
+                selectedShape = polygon;
+            } else {
+                MODE = MAP_MODE.ADD_ROW;
+            }
+        }
+    ;
+
 
     let initDrawingManager = () => {
         drawingManager = new google.maps.drawing.DrawingManager({
@@ -29,21 +57,27 @@ function Map() {
                 editable: true
             }
         });
+        disableDrawingMode();
 
         drawingManager.setMap(map);
     };
 
 
     let initAdressAutocomplete = () => {
-        let input = document.getElementById('address-input');
-        let autocomplete = new google.maps.places.Autocomplete(input);
+        addressInput = document.getElementById('address-input');
+        let autocomplete = new google.maps.places.Autocomplete(addressInput);
         autocomplete.bindTo('bounds', map);
 
         autocomplete.addListener('place_changed', () => {
             deleteSelectedShape();
-            let place = autocomplete.getPlace();
-            map.setCenter(place.geometry.location);
-            map.setZoom(15);
+            place = autocomplete.getPlace();
+            if (place.geometry) {
+                map.setCenter(place.geometry.location);
+                map.setZoom(16);
+                enableDrawingMode();
+            } else {
+                disableDrawingMode();
+            }
         });
     };
 
@@ -94,12 +128,22 @@ function Map() {
         }
 
         hideInfoWindow();
+        enableDrawingMode();
+        $confirmBtn.prop('disabled', true);
+    };
+
+    let disableDrawingMode = () => {
+        drawingManager.setDrawingMode(null);
+
+    };
+
+    let enableDrawingMode = () => {
         drawingManager.setDrawingMode("polygon");
     };
 
     let onOverlaycomplete = (e) => {
         if (e.type === google.maps.drawing.OverlayType.POLYGON) {
-            drawingManager.setDrawingMode(null);
+            disableDrawingMode();
 
             let newShape = e.overlay;
             newShape.type = e.type;
@@ -108,7 +152,7 @@ function Map() {
             });
             setSelection(newShape);
             calculateArea();
-
+            $confirmBtn.prop('disabled', false);
         }
     };
 
@@ -118,15 +162,55 @@ function Map() {
         $('#confirmBtn').on('click', onConfirm);
     };
 
-    let onConfirm = () => {};
+    let onConfirm = () => {
+        $confirmBtn.prop('disabled', true);
+        let area = google.maps.geometry.spherical.computeArea(selectedShape.getPath());
 
-    this.initialize = () => {
-        initMap();
+        let data = {
+            address: place.formatted_address,
+            areaSize: Math.trunc(area),
+            location: place.geometry.location,
+            shapePaths: selectedShape.getPath().b.map((p) => {
+                return {lat: p.lat(), lng: p.lng()};
+            })
+        };
+
+        if (MODE === MAP_MODE.ADD_ROW) {
+            locTable.addRow(data);
+        } else if (MODE === MAP_MODE.UPDATE_ROW) {
+            locTable.updateRow(data, updateRowIndex);
+        } else {
+            throw new Error("Unexpected map mode");
+        }
+        closeModal();
+    };
+
+    this.initialize = (shapePaths) => {
+        initMap(shapePaths);
         initDrawingManager();
         initListeners();
         initAdressAutocomplete();
+    };
 
-    }
+    this.updateUserSelection = ({shapePaths, address, location}, rowIndex) => {
+        MODE = MAP_MODE.UPDATE_ROW;
+        updateRowIndex = rowIndex;
+        this.initialize({shapePaths, location});
+        let area = google.maps.geometry.spherical.computeArea(selectedShape.getPath());
+        showInfoWindow(area);
+        addressInput.value = address;
+        openModal();
+    };
+
+    this.destroy = () => {
+        [map, drawingManager, selectedShape, place, infowindow, updateRowIndex].forEach((prop) => {
+            prop = null;
+            addressInput.value = '';
+        });
+
+        $('#confirmBtn').off();
+        $("#map").empty();
+    };
 }
 
 
