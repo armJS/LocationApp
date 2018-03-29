@@ -57,7 +57,6 @@ button#resetBtn {
 
 .table {
     border-collapse: collapse;
-    /*  width: auto;*/
     border: 1px solid beige;
 }
 
@@ -66,14 +65,11 @@ table, th {
 }
 
 .table-header {
-    /* display: flex;
-     width: 100%;*/
     background: #000;
     color: white;
 }
 
 .table-row {
-    /* display: flex;*/
     width: 100%;
 }
 
@@ -96,4 +92,19 @@ div.modal {
 
 .hide {
     display: none;
+}
+
+a#addNewLink, a#addNewLink:visited {
+    background-color: black;
+    color: white;
+    padding: 10px 10px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+
+a#addNewLink:hover, a#addNewLink:active {
+    background-color: gray;
 }
